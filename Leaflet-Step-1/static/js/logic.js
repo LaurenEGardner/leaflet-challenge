@@ -1,7 +1,7 @@
 // Creating map object
 var myMap = L.map("mapid", {
     center: [37.09, -95.71],
-    zoom: 5
+    zoom: 4
   });
 
 // Adding tile layer
@@ -10,7 +10,7 @@ L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
   tileSize: 512,
   maxZoom: 18,
   zoomOffset: -1,
-  id: "mapbox/streets-v11",
+  id: "mapbox/light-v10",
   accessToken: API_KEY
 }).addTo(myMap);
 
@@ -42,6 +42,10 @@ d3.json(geoData).then(function(data) {
     console.log(data)
     // Creating a GeoJSON layer with the retrieved data
     L.geoJson(data, {
-        style: mapStyle
+        onEachFeature: function(features, layer) {
+            layer.bindPopup('<h1>Magnitude: '+features.properties.mag+'</h1><p>Time: '+new Date(features.properties.time)+'</p>')
+        }
     }).addTo(myMap);
+    
   });
+

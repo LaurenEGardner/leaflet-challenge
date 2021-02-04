@@ -19,38 +19,26 @@ var geoData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day
 
 var geojson = d3.json(geoData);
 
-//Define eqDepth function for marker color
-function eqDepth(depth) {
-    if (depth < 10) {
-        return "#bdff00";
-    }else if (depth < 30) {
-        return "#e3f018";
-    }else if (depth < 50) {
-        return "#ffce00";
-    }else if (depth < 70) {
-        return "#ff6612";
-    }else if (depth < 90) {
-        return "#ff0000";
-    }else return "#c12424";
-}
+
 
 //Define eqScale function for marker size
 function eqScale(magnitude) {
     return magnitude * 3;
 }
 
-
-// // Our style object
-// var mapStyle = {
-//     color: "white",
-//     fillColor: "pink",
-//     fillOpacity: 0.5,
-//     weight: 1.5
-//   };
+//function to return fill color based on depth
+function getColor(d) {
+    return d > 90  ? '#c12424' :
+           d > 70  ? '#ff0000' :
+           d > 50   ? '#ff6612' :
+           d > 30   ? '#ffce00' :
+           d > 10   ? '#e3f018' :
+                    '#bdff00';
+}
 
 //grabbing GeoJSON data
 d3.json(geoData).then(function(data) {
-    console.log(data)
+    //console.log(data)
     // Creating a GeoJSON layer with the retrieved data
     L.geoJson(data, {
         onEachFeature: function(features, layer) {
@@ -58,7 +46,7 @@ d3.json(geoData).then(function(data) {
         },
         pointToLayer: function(features, latlng) {
             return L.circleMarker(latlng, {
-                fillColor: eqDepth(features.geometry.coordinates[2]),
+                fillColor: getColor(features.geometry.coordinates[2]),
                 radius: eqScale(features.properties.mag),
                 color: "black",
                 weight: .5,
@@ -71,16 +59,30 @@ d3.json(geoData).then(function(data) {
 
   //adding legend
 
-var colorList = []
-var labelList = []
+var colorList = [["#bdff00","#e3f018","#ffce00","#ff6612","#ff0000","#c12424"]]
+
+
 
   //set up the legend
-var legend = L.control({position: 'bottomright'})
-legend.onAdd = function(myMap) {
-    var div = L.DomUtil.create('div', 'info legend')
-    var colors = ["#bdff00","#e3f018","#ffce00","#ff6612","#ff0000","#c12424"]
-    var labels = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"]
-  }
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function(map) {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [-10, 10, 30, 50, 70, 90],
+        labels = [];
+
+    //loop through depth list to generate a label with the matching color
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    }
+
+    return div;
+  };
+
+  legend.addTo(myMap);
 
 
 

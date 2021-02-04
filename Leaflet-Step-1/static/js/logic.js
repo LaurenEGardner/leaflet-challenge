@@ -17,7 +17,7 @@ L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 // Load in GeoJson data
 var geoData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
 
-var geojson;
+var geojson = d3.json(geoData);
 
 //Define eqDepth function for marker color
 function eqDepth(depth) {
@@ -44,8 +44,20 @@ d3.json(geoData).then(function(data) {
     L.geoJson(data, {
         onEachFeature: function(features, layer) {
             layer.bindPopup('<h1>Magnitude: '+features.properties.mag+'</h1><p>Time: '+new Date(features.properties.time)+'</p>')
+        },
+        pointToLayer: function(features, latlng) {
+            return L.circleMarker(latlng, myLayerStyle);
         }
     }).addTo(myMap);
     
   });
+
+  //create an object with a list of options to style the circle marker
+  var myLayerStyle= {
+      color: 'orange',
+      radius: 50
+  }
+
+
+
 

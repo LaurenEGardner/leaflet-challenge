@@ -21,13 +21,24 @@ var geojson = d3.json(geoData);
 
 //Define eqDepth function for marker color
 function eqDepth(depth) {
-    return depth;
+    if (depth < 10) {
+        return "#bdff00";
+    }else if (depth < 30) {
+        return "#e3f018";
+    }else if (depth < 50) {
+        return "#ffce00";
+    }else if (depth < 70) {
+        return "#ff6612";
+    }else if (depth < 90) {
+        return "#ff0000";
+    }else return "#c12424";
 }
 
 //Define eqScale function for marker size
 function eqScale(magnitude) {
-    return magnitude * 100;
+    return magnitude * 3;
 }
+
 
 // Our style object
 var mapStyle = {
@@ -43,20 +54,22 @@ d3.json(geoData).then(function(data) {
     // Creating a GeoJSON layer with the retrieved data
     L.geoJson(data, {
         onEachFeature: function(features, layer) {
-            layer.bindPopup('<h1>Magnitude: '+features.properties.mag+'</h1><p>Time: '+new Date(features.properties.time)+'</p>')
+            layer.bindPopup('<h1>Magnitude: '+features.properties.mag+'</h1><p> Depth: '+features.geometry.coordinates[2]+'<br>Time: '+new Date(features.properties.time)+'</p>')
         },
         pointToLayer: function(features, latlng) {
-            return L.circleMarker(latlng, myLayerStyle);
+            return L.circleMarker(latlng, {
+                fillColor: eqDepth(features.geometry.coordinates[2]),
+                radius: eqScale(features.properties.mag),
+                color: "black",
+                weight: .5,
+                fillOpacity: 0.7
+            });
         }
     }).addTo(myMap);
     
   });
 
-  //create an object with a list of options to style the circle marker
-  var myLayerStyle= {
-      color: 'orange',
-      radius: 50
-  }
+
 
 
 

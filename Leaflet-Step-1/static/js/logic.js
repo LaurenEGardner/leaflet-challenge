@@ -28,12 +28,12 @@ function eqScale(magnitude) {
 
 //function to return fill color based on depth
 function getColor(d) {
-    return d > 90 ? '#c12424' :
-        d > 70 ? '#ff0000' :
-            d > 50 ? '#ff6612' :
-                d > 30 ? '#ffce00' :
-                    d > 10 ? '#e3f018' :
-                        '#bdff00';
+    if (d > 90) return '#c12424'
+    else if (d > 70) return '#ff0000'
+    else if (d > 50) return '#ff6612'
+    else if (d > 30) return '#ffce00'
+    else if (d > 10) return '#e3f018'
+    else return '#bdff00';
 }
 
 //grabbing GeoJSON data
@@ -69,24 +69,22 @@ var legend = L.control({ position: 'bottomright' });
 legend.onAdd = function (map) {
 
     var div = L.DomUtil.create('div', 'info legend'),
+        grades = [-10, 10, 30, 50, 70, 90],
         limits = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"],
         colors = ["#bdff00", "#e3f018", "#ffce00", "#ff6612", "#ff0000", "#c12424"],
         labels = [];
 
-        var legendInfo = "<h1>Depth</h1>" +
-        "<div class=\"labels\">" +
-          "<div class=\"min\">" + limits[0] + "</div>" +
-          "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
-        "</div>";
-  
-      div.innerHTML = legendInfo;
-  
-      limits.forEach(function(limit, index) {
-        labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
-      });
-  
-      div.innerHTML += "<ul>" + labels.join("") + "</ul>";
-      return div;
+    var legendInfo = "<h1>Depth</h1>";
+
+    div.innerHTML = legendInfo;
+
+    limits.forEach(function (limit, index) {
+        labels.push("<ul style=\"background-color: " + colors[index] + "\">" +
+            limit + "</ul>");
+    });
+    div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+
+    return div;
 };
 
 legend.addTo(myMap);
